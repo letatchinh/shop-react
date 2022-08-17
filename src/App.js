@@ -1,24 +1,43 @@
-import logo from './logo.svg';
+
 import './App.css';
+import AddNew from './Layout/AddNew';
+import Body from './Layout/Body';
+import {Routes,Route,} from "react-router-dom";
+import { createContext, useState , useEffect, useCallback } from 'react';
+import {URLLISTCART} from './constant'
+import axios from 'axios';
+
+export const Mycontext = createContext();
 
 function App() {
+  const [status,setStatus] = useState(true)
+  const [dataListCart,setDataListCart] = useState([])
+  const fecthData = useCallback(async() => {
+   await axios.get(URLLISTCART).then(res => setDataListCart(res.data));
+  },[status])
+  useEffect(() => 
+  {
+    fecthData()
+  }
+  ,[fecthData])
+  const reRender = () => {
+    setStatus(!status);
+    console.log("da Rerender");
+  }
+  const value = {
+    status,
+    reRender,
+    dataListCart
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <Mycontext.Provider value={value}>
+      <div className="App container">
+    <Routes>
+      <Route path='/new' element={<AddNew />}></Route>
+      <Route path='/' element={<Body />}></Route>
+    </Routes>
     </div>
+    </Mycontext.Provider>
   );
 }
 
